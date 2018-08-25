@@ -105,6 +105,8 @@ public class AddressBook {
                                                       + PERSON_DATA_PREFIX_EMAIL + "EMAIL";
     private static final String COMMAND_ADD_EXAMPLE = COMMAND_ADD_WORD + " John Doe p/98765432 e/johnd@gmail.com";
 
+    private static final String COMMAND_EDIT_WORD = "edit";
+
     private static final String COMMAND_FIND_WORD = "find";
     private static final String COMMAND_FIND_DESC = "Finds all persons whose names contain any of the specified "
                                         + "keywords (case-sensitive) and displays them as a list with index numbers.";
@@ -132,6 +134,8 @@ public class AddressBook {
     private static final String COMMAND_EXIT_WORD = "exit";
     private static final String COMMAND_EXIT_DESC = "Exits the program.";
     private static final String COMMAND_EXIT_EXAMPLE = COMMAND_EXIT_WORD;
+
+
 
     private static final String DIVIDER = "===================================================";
 
@@ -381,6 +385,8 @@ public class AddressBook {
             return executeClearAddressBook();
         case COMMAND_HELP_WORD:
             return getUsageInfoForAllCommands();
+        case COMMAND_EDIT_WORD:
+            return executeEditPersonNum(commandArgs);
         case COMMAND_EXIT_WORD:
             executeExitProgramRequest();
         default:
@@ -454,6 +460,37 @@ public class AddressBook {
         final ArrayList<String[]> personsFound = getPersonsWithNameContainingAnyKeyword(keywords);
         showToUser(personsFound);
         return getMessageForPersonsDisplayedSummary(personsFound);
+    }
+
+
+    /**
+     * Finds and lists all persons in address book whose name contains any of the argument keywords.
+     * Keyword matching is case sensitive.
+     *
+     * @param commandArgs full command args string from the user
+     * @return feedback display message for the operation result
+     */
+    private static String executeEditPersonNum(String commandArgs) {
+        for (String[] s : getAllPersonsInAddressBook()){
+            if (s[PERSON_DATA_INDEX_NAME].equals(commandArgs)) {
+                System.out.print("Please choose to edit number or email: ");
+                String command=SCANNER.nextLine();
+                ArrayList<String> arg;
+                arg=splitByWhitespace(command);
+                switch(arg.get(0)) {
+                    case "number":
+                        s[PERSON_DATA_INDEX_PHONE]=arg.get(1);
+                        break;
+                    case "email":
+                        s[PERSON_DATA_INDEX_EMAIL]=arg.get(1);
+                        break;
+                    default:
+                }
+            }
+            savePersonsToFile(getAllPersonsInAddressBook(), storageFilePath);
+        }
+
+        return "Particulars has been updated";
     }
 
     /**
