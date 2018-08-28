@@ -475,16 +475,17 @@ public class AddressBook {
      * @return feedback display message for the operation result
      */
     private static String executeEditPerson(String commandArgs) {
-        int messageCode=0;
+        String feedbackMessage;
+        feedbackMessage = MESSAGE_PERSON_NOT_IN_ADDRESSBOOK;
         for (String[] s : getAllPersonsInAddressBook()){
             if (s[PERSON_DATA_INDEX_NAME].equals(commandArgs)) {
-                messageCode=editNumOrEmail(s);
+                feedbackMessage=editNumOrEmail(s);
             }
         }
-        if(messageCode==1 || messageCode==2) {
+        if(feedbackMessage.equals(MESSAGE_NUM_UPDATED) || feedbackMessage.equals(MESSAGE_EMAIL_UPDATED)) {
             savePersonsToFile(getAllPersonsInAddressBook(), storageFilePath);
         }
-        return getMessageForEditingSummary(messageCode);
+        return feedbackMessage;
     }
 
     /**
@@ -492,24 +493,26 @@ public class AddressBook {
      * Keyword matching is case sensitive.
      *
      * @param people the people's particular which need to be edited
-     * @return feedback the messageCode for summary of edit operation
+     * @return return the message for summary of edit operation
      */
-    private static int editNumOrEmail(String[] people) {
+    private static String editNumOrEmail(String[] people) {
         System.out.print("Please choose to edit number or email: ");
         String command=SCANNER.nextLine();
         ArrayList<String> arg;
         arg=splitByWhitespace(command);
+        if(arg.size()==1 && !arg.get(0).equals("cancel"))
+            return MESSAGE_INVALID_FORMAT;
         switch(arg.get(0)) {
             case "number":
                 people[PERSON_DATA_INDEX_PHONE]=arg.get(1);
-                return 1;
+                return MESSAGE_PERSON_NOT_IN_ADDRESSBOOK;
             case "email":
                 people[PERSON_DATA_INDEX_EMAIL]=arg.get(1);
-                return 2;
+                return MESSAGE_EMAIL_UPDATED;
             case "cancel":
-                return 3;
+                return MESSAGE_CANCEL_UPDATED;
             default:
-                return 4;
+                return MESSAGE_INVALID_FORMAT;
         }
     }
 
@@ -522,29 +525,6 @@ public class AddressBook {
     private static String getMessageForPersonsDisplayedSummary(ArrayList<String[]> personsDisplayed) {
         return String.format(MESSAGE_PERSONS_FOUND_OVERVIEW, personsDisplayed.size());
     }
-
-    /**
-     * Constructs a feedback message after editing a person's particular from the address book.
-     *
-     * @param messageCode used to generate return message
-     * @return summary message for persons displayed
-     */
-    private static String getMessageForEditingSummary(int messageCode) {
-        switch (messageCode) {
-            case 0:
-                return MESSAGE_PERSON_NOT_IN_ADDRESSBOOK;
-            case 1:
-                return MESSAGE_NUM_UPDATED;
-            case 2:
-                return MESSAGE_EMAIL_UPDATED;
-            case 3:
-                return MESSAGE_CANCEL_UPDATED;
-            case 4:
-                return MESSAGE_INVALID_FORMAT;
-        }
-        return MESSAGE_PERSON_NOT_IN_ADDRESSBOOK;
-    }
-
 
     /**
      * Extracts keywords from the command arguments given for the find persons command.
