@@ -60,6 +60,8 @@
   find Dickson
   # find multiple with some keywords
   find Charlie Betsy
+  # find Adam
+  find Adam
 
 ##########################################################
 # test delete person command
@@ -106,3 +108,4 @@
   # exits properly
   exit
   list
+
